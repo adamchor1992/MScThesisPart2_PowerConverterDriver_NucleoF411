@@ -8,7 +8,7 @@
 #include <string.h>
 #include <cmath>
 
-#define DEBUG 0
+#define DEBUG 1
 
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;

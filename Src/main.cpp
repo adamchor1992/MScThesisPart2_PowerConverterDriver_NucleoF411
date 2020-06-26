@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DEBUG 0
+#define DEBUG 1
 
 const int UART_TX_WAITING = 50;
 const int COMMAND_LENGTH = 60;
