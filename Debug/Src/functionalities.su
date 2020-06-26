@@ -1,0 +1,18 @@
+gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
+uart_packet.h:34:18:const uint8_t* UartPacket::GetPayload() const	16	static
+module.h:11:8:bool Module::GetParameterState(int) const	16	static
+module.h:12:10:double Module::GetParameterValue(int) const	16	static
+functionalities.cpp:20:6:void InitModule(int)	72	static
+functionalities.cpp:71:6:void DeinitModule(int)	64	static
+functionalities.cpp:92:6:void SetGraphLowerRange(int, long long int)	104	static
+functionalities.cpp:131:6:void SetGraphUpperRange(int, long long int)	104	static
+functionalities.cpp:170:6:void SetGraphTimeRange(int, int)	80	static
+functionalities.cpp:206:6:void GenerateLinearGraph(int, int, double, double, double)	160	static
+functionalities.cpp:288:6:void GenerateSineGraph(int, int, int, int, double)	192	static
+functionalities.cpp:352:6:void GenerateSquareGraph(int, int, int, int, double, int)	160	static
+functionalities.cpp:473:6:void SendWrongCrc(int)	64	static
+functionalities.cpp:492:6:void GetParameters(int)	40	static
+functionalities.cpp:529:6:void SendAdcToGraphScreen(int, int)	136	static
+functionalities.cpp:596:6:void SendAdcToDataScreen(int, int)	136	static
+functionalities.cpp:669:6:void SendCustomPacket(int, char, double)	104	static
+functionalities.cpp:708:6:void ProcessReceivedData(UartPacket&)	56	static

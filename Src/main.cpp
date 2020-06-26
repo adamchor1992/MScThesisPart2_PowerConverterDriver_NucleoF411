@@ -1,30 +1,35 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+******************************************************************************
+* @file           : main.c
+* @brief          : Main program body
+******************************************************************************
+* @attention
+*
+* <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+* All rights reserved.</center></h2>
+*
+* This software component is licensed by ST under BSD 3-Clause license,
+* the "License"; You may not use this file except in compliance with the
+* License. You may obtain a copy of the License at:
+*                        opensource.org/licenses/BSD-3-Clause
+*
+******************************************************************************
+*/
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <cstdio>
+#include <string>
+#include <vector>
 
+#include "commands.h"
+#include "uart_packet.h"
+#include "functionalities.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +39,23 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEBUG 0
+
+const int UART_TX_WAITING = 50;
+const int COMMAND_LENGTH = 60;
+
+/*Command and feedback data UART*/
+UART_HandleTypeDef huart1;
+/*Virtual COM Port Diagnostic UART*/
+UART_HandleTypeDef huart2;
+/*Touch Panel Communication UART*/
+UART_HandleTypeDef huart6;
+
+UartPacket uartPacketReceived;
+
+using std::string;
+using std::vector;
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,12 +66,14 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
-UART_HandleTypeDef huart1;
-UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart6;
-
 /* USER CODE BEGIN PV */
 
+int fputc(int ch, FILE *f)
+{
+  HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, UART_TX_WAITING);
+  
+  return ch;
+}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,15 +81,111 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_USART6_UART_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
+char receivedCommandBuffer[COMMAND_LENGTH] = {0};
+string fullCommandBuffer;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/*UART receive interrupt callback function*/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
+{
+  /*Command UART*/
+  if(huart == &huart1)
+  {
+    printf("\n-----------------Received command data from PC-----------------\n");
+    printf("Command: %.60s\n", receivedCommandBuffer);
+    
+    fullCommandBuffer.assign(receivedCommandBuffer);
+    
+    vector<string> extractedArguments;
+    
+    if(fullCommandBuffer.find("#InitModule") != string::npos)
+    {
+      printf("Invoking InitModule command\n");
+      CommandInitModule(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#DeinitModule") != string::npos)
+    {
+      printf("Invoking DeinitModule command\n");
+      CommandDeinitModule(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#SetGraphMin") != string::npos)
+    {
+      printf("Invoking SetGraphMin command\n");
+      CommandSetGraphMin(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#SetGraphMax") != string::npos)
+    {
+      printf("Invoking SetGraphMax command\n");
+      CommandSetGraphMax(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#SetGraphTime") != string::npos)
+    {
+      printf("Invoking SetGraphTime command\n");
+      CommandSetGraphTime(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#GraphLinear") != string::npos)
+    {
+      printf("Invoking GraphLinear command\n");
+      CommandGraphLinear(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#GraphSine") != string::npos)
+    {
+      printf("Invoking GraphSine command\n");
+      CommandGraphSine(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#GraphSquare") != string::npos)
+    {
+      printf("Invoking GraphSquare command\n");
+      CommandGraphSquare(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#SendWrongCrc") != string::npos)
+    {
+      printf("Invoking SendWrongCrc command\n");
+      CommandSendWrongCrc(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#GetParameters") != string::npos)
+    {
+      printf("Invoking GetParameters command\n");
+      CommandGetParameters(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#Adc1") != string::npos)
+    {
+      printf("Invoking Adc1 command\n");
+      CommandAdc1(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#Adc2") != string::npos)
+    {
+      printf("Invoking Adc2 command\n");
+      CommandAdc2(fullCommandBuffer);
+    }
+    else if(fullCommandBuffer.find("#SendPacket") != string::npos)
+    {
+      printf("Invoking SendPacket command\n");
+      CommandSendPacket(fullCommandBuffer);
+    }
+    else
+    {
+      printf("Unrecognized command, reseting buffer\n");
+      fullCommandBuffer.clear();
+    }
+    
+    HAL_UART_Receive_IT(&huart1, reinterpret_cast<uint8_t*>(receivedCommandBuffer), COMMAND_LENGTH);
+  }
+  else if(huart == &huart6)
+  {
+    printf("\n-----------------Received data from Touch Panel STM32F469\n");   
+    
+    ProcessReceivedData(uartPacketReceived);
+    
+    HAL_UART_Receive_IT(&huart6, static_cast<uint8_t*>(uartPacketReceived), PACKET_SIZE);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -75,7 +195,7 @@ static void MX_USART6_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -84,36 +204,41 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
-  MX_USART2_UART_Init();
   MX_USART6_UART_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  
+  HAL_UART_Receive_IT(&huart1, reinterpret_cast<uint8_t*>(receivedCommandBuffer), COMMAND_LENGTH);
+  HAL_UART_Receive_IT(&huart6, static_cast<uint8_t*>(uartPacketReceived), PACKET_SIZE);
+  
+  HAL_ADC_Start(&hadc1);
+  
+  printf("System initialized\n");
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  printf("Hehe");
-  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+  }
   /* USER CODE END 3 */
 }
 
@@ -169,13 +294,13 @@ static void MX_ADC1_Init(void)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
-
+  
   /* USER CODE END ADC1_Init 0 */
 
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
-
+  
   /* USER CODE END ADC1_Init 1 */
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
@@ -229,7 +354,7 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-
+  
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -243,11 +368,11 @@ static void MX_USART1_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART1_Init 0 */
-
+  
   /* USER CODE END USART1_Init 0 */
 
   /* USER CODE BEGIN USART1_Init 1 */
-
+  
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
   huart1.Init.BaudRate = 115200;
@@ -262,7 +387,7 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-
+  
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -276,11 +401,11 @@ static void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-
+  
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
-
+  
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
   huart2.Init.BaudRate = 115200;
@@ -295,7 +420,7 @@ static void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-
+  
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -309,11 +434,11 @@ static void MX_USART6_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART6_Init 0 */
-
+  
   /* USER CODE END USART6_Init 0 */
 
   /* USER CODE BEGIN USART6_Init 1 */
-
+  
   /* USER CODE END USART6_Init 1 */
   huart6.Instance = USART6;
   huart6.Init.BaudRate = 115200;
@@ -328,7 +453,7 @@ static void MX_USART6_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART6_Init 2 */
-
+  
   /* USER CODE END USART6_Init 2 */
 
 }
@@ -349,20 +474,20 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pin : PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
@@ -378,7 +503,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -394,7 +519,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

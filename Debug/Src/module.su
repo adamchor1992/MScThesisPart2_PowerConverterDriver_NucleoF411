@@ -1,0 +1,6 @@
+module.h:18:8:void Module::EnableParameterByIndex(int)	16	static
+module.h:19:8:void Module::DisableParameterByIndex(int)	16	static
+module.h:20:8:void Module::SetParameterByIndex(int, double)	24	static
+module.cpp:4:6:void Module::EnableParameter(Parameter)	16	static
+module.cpp:43:6:void Module::DisableParameter(Parameter)	16	static
+module.cpp:82:6:void Module::SetParameter(Parameter, double)	24	static

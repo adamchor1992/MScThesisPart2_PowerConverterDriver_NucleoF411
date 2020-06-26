@@ -1,4 +1,7 @@
-Src/main.o: ../Src/main.cpp ../Inc/main.h \
+Src/functionalities.o: ../Src/functionalities.cpp \
+ ../Inc/functionalities.h ../Inc/uart_packet.h \
+ ../Inc/packet_field_definitions.h ../Inc/utilities.h \
+ ../Inc/init_parameters.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -26,11 +29,17 @@ Src/main.o: ../Src/main.cpp ../Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Inc/commands.h ../Inc/uart_packet.h ../Inc/packet_field_definitions.h \
- ../Inc/functionalities.h
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h ../Inc/module.h
 
-../Inc/main.h:
+../Inc/functionalities.h:
+
+../Inc/uart_packet.h:
+
+../Inc/packet_field_definitions.h:
+
+../Inc/utilities.h:
+
+../Inc/init_parameters.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -88,10 +97,4 @@ Src/main.o: ../Src/main.cpp ../Inc/main.h \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Inc/commands.h:
-
-../Inc/uart_packet.h:
-
-../Inc/packet_field_definitions.h:
-
-../Inc/functionalities.h:
+../Inc/module.h:

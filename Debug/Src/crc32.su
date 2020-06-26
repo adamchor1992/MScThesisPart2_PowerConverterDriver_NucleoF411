@@ -1,0 +1,1 @@
+crc32.cpp:5:10:uint32_t CalculateCrc32(const uint8_t*, int)	56	static
