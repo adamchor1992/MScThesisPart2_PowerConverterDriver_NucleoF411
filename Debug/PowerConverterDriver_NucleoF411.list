@@ -5928,7 +5928,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  printf("Test");
+	  printf("Hehe");
  80027a4:	4801      	ldr	r0, [pc, #4]	; (80027ac <main+0x28>)
  80027a6:	f000 fc6b 	bl	8003080 <iprintf>
  80027aa:	e7fb      	b.n	80027a4 <main+0x20>
