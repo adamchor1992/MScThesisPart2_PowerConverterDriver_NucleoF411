@@ -30,12 +30,13 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
+#include "stm32f4xx_hal.h"
 
+extern UART_HandleTypeDef huart2;
 
 /* Variables */
 //#undef errno
 extern int errno;
-extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
 
 register char * stack_ptr asm("sp");
@@ -43,6 +44,11 @@ register char * stack_ptr asm("sp");
 char *__env[1] = { 0 };
 char **environ = __env;
 
+__attribute__((weak)) int __io_putchar(int ch)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+    return ch;
+}
 
 /* Functions */
 void initialise_monitor_handles()
