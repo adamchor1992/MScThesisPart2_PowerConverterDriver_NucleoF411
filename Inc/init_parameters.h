@@ -87,7 +87,18 @@ char* const initParametersModule1[INIT_PACKETS_COUNT][PAYLOAD_SIZE + 1] =
   {Module1SettableParameter7Name},
   {Module1SettableParameter8Name},
   {Module1SettableParameter9Name},
-  {Module1SettableParameter10Name}
+  {Module1SettableParameter10Name},
+
+  {Module1SettableParameter1Value},
+  {Module1SettableParameter2Value},
+  {Module1SettableParameter3Value},
+  {Module1SettableParameter4Value},
+  {Module1SettableParameter5Value},
+  {Module1SettableParameter6Value},
+  {Module1SettableParameter7Value},
+  {Module1SettableParameter8Value},
+  {Module1SettableParameter9Value},
+  {Module1SettableParameter10Value}
 };
 
 //Module2
@@ -175,7 +186,18 @@ char* const initParametersModule2[INIT_PACKETS_COUNT][PAYLOAD_SIZE + 1] =
   {Module2SettableParameter7Name},
   {Module2SettableParameter8Name},
   {Module2SettableParameter9Name},
-  {Module2SettableParameter10Name}
+  {Module2SettableParameter10Name},
+
+  {Module2SettableParameter1Value},
+  {Module2SettableParameter2Value},
+  {Module2SettableParameter3Value},
+  {Module2SettableParameter4Value},
+  {Module2SettableParameter5Value},
+  {Module2SettableParameter6Value},
+  {Module2SettableParameter7Value},
+  {Module2SettableParameter8Value},
+  {Module2SettableParameter9Value},
+  {Module2SettableParameter10Value}
 };
 
 //Module3
@@ -263,5 +285,16 @@ char* const initParametersModule3[INIT_PACKETS_COUNT][PAYLOAD_SIZE + 1] =
   {Module3SettableParameter7Name},
   {Module3SettableParameter8Name},
   {Module3SettableParameter9Name},
-  {Module3SettableParameter10Name}
+  {Module3SettableParameter10Name},
+
+  {Module3SettableParameter1Value},
+  {Module3SettableParameter2Value},
+  {Module3SettableParameter3Value},
+  {Module3SettableParameter4Value},
+  {Module3SettableParameter5Value},
+  {Module3SettableParameter6Value},
+  {Module3SettableParameter7Value},
+  {Module3SettableParameter8Value},
+  {Module3SettableParameter9Value},
+  {Module3SettableParameter10Value}
 };
